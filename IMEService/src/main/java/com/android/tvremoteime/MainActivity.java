@@ -1,9 +1,12 @@
 package com.android.tvremoteime;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -16,6 +19,8 @@ import android.widget.TextView;
 import com.android.tvremoteime.server.RemoteServer;
 import com.android.tvremoteime.adb.AdbHelper;
 import com.zxt.dlna.dmr.ZxtMediaRenderer;
+
+import java.util.List;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -34,13 +39,51 @@ public class MainActivity extends Activity implements View.OnClickListener {
         this.setTitle(this.getResources().getString( R.string.app_name) + "  V" + AppPackagesHelper.getCurrentPackageVersion(this));
         dlnaNameText.setText(DLNAUtils.getDLNANameSuffix(this.getApplicationContext()));
 
-        startService(new Intent(IMEService.ACTION));
+        final Intent intent = new Intent(IMEService.ACTION);
+        final Intent eintent = new Intent(createExplicitFromImplicitIntent(this,intent));
+        startService(eintent);
         if(!Environment.isDefaultIME(this)) {
             if (AdbHelper.getInstance() == null) AdbHelper.createInstance();
         }
         Environment.toast(getApplicationContext(), "服务启动，稍后可尝试访问控制端页面");
 
         refreshQRCode();
+    }
+    /***
+     * Android L (lollipop, API 21) introduced a new problem when trying to invoke implicit intent,
+     * "java.lang.IllegalArgumentException: Service Intent must be explicit"
+     *
+     * If you are using an implicit intent, and know only 1 target would answer this intent,
+     * This method will help you turn the implicit intent into the explicit form.
+     *
+     * Inspired from SO answer: http://stackoverflow.com/a/26318757/1446466
+     * @param context
+     * @param implicitIntent - The original implicit intent
+     * @return Explicit Intent created from the implicit original intent
+     */
+    public static Intent createExplicitFromImplicitIntent(Context context, Intent implicitIntent) {
+        // Retrieve all services that can match the given intent
+        PackageManager pm = context.getPackageManager();
+        List<ResolveInfo> resolveInfo = pm.queryIntentServices(implicitIntent, 0);
+
+        // Make sure only one match was found
+        if (resolveInfo == null || resolveInfo.size() != 1) {
+            return null;
+        }
+
+        // Get component info and create ComponentName
+        ResolveInfo serviceInfo = resolveInfo.get(0);
+        String packageName = serviceInfo.serviceInfo.packageName;
+        String className = serviceInfo.serviceInfo.name;
+        ComponentName component = new ComponentName(packageName, className);
+
+        // Create a new intent. Use the old one for extras and such reuse
+        Intent explicitIntent = new Intent(implicitIntent);
+
+        // Set the component to be explicit
+        explicitIntent.setComponent(component);
+
+        return explicitIntent;
     }
 
     @Override
