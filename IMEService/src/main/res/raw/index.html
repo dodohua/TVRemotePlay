@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+	<title>TV Remote IME</title>
+	<meta name="layoutmode" content="standard">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div class="container">
+		<div class="version">当前版本：<span class="version-code" id="curVer">1.0</span><a href="#" target="_blank" id="newVerUrl" style="margin-left:10px;display:none;">最新版本：<span class="version-code" id="newVer">1.0</span></a></div>
+	    <div class="tabs">
+		  <div class="tab cur" data-rel="controls">输入遥控</div>
+		  <div class="tab" data-rel="app">应用管理</div>
+		  <div class="tab" data-rel="file">文件管理</div>
+		  <div class="tab" data-rel="video">视频直播</div>
+		</div>
+		<div class="keys" data-tab="controls">
+			<div id="direction-btns" class="direction-btns">
+				<div class="otherbtn home-btn" id="home-btn" data-key='3' data-bp='-586px -315px'></div>
+				<div class="otherbtn vol-btn" id="vol-btn" data-key='164' data-bp='-711px -315px'></div>
+				<div class="direction left-btn" id="left-btn" data-key='21' data-bp='-1px -247px'></div>
+				<div class="direction top-btn" id="top-btn" data-key='19' data-bp='-247px -1px'></div>
+				<div class="direction right-btn" id="right-btn" data-key='22' data-bp='-493px -1px'></div>
+				<div class="direction bottom-btn" id="bottom-btn" data-key='20' data-bp='-247px -247px'></div>
+				<div class="direction center-btn" id="center-btn" data-key='23' data-bp='-740px -1px'></div>
+				<div class="otherbtn back-btn" id="back-btn" data-key='4' data-bp='-586px -251px'></div>
+				<div class="otherbtn menu-btn" id="menu-btn" data-key='82' data-bp='-711px -251px'></div>
+				<div class="otherbtn vol1-btn" id="vol1-btn" data-key='24' data-bp='-711px -379px'></div>
+				<div class="otherbtn vol2-btn" id="vol2-btn" data-key='25' data-bp='-711px -379px'></div>
+			</div>
+		</div>
+		<div class="main-wrapper" data-tab="controls">
+			<div class="inputarea-wrapper">
+				<textarea id="inputarea" rows="2" placeholder="点此为电视输入文字"></textarea>
+			</div>
+			<div id="confirm" class="btn-nowd btn-wd">输入</div>
+		</div>
+		<div class="btn-line" data-tab="controls">
+		    <input type="button" value="退格" class="btn" id="btnDel" data-key='67' />
+		    <input type="button" value="清空" class="btn" id="btnCls" data-key='cls' />
+		</div>
+		<div class="app-panel hide" data-tab="app">
+			<div class="app-un">
+		    <a class="showSettings" id="showSettings">系统设置</a>
+			<label style="margin-left:10px;" class="blue"><input type="checkbox" id="cbListSystem">显示系统应用</label>
+			<label style="margin-left:10px;"><input type="checkbox" id="cbUninstall">卸载应用</label></div>
+			<div class="app-list"></div>
+		</div>
+		<div class="app-upload" data-tab="controls">
+		    <input type="file" id="upfile" value=".." />
+		    <input type="button" value="传送文件" class="upload-btn" id="btnUpload" />
+			<div class="upload-process">
+			    <div class="processbar" id="processbar1"></div>
+			</div>
+		    <input type="button" value="清除缓存" class="upload-btn" id="btnClear" />
+		</div>
+		<div class="upload-settings" data-tab="controls">
+		   <label style="margin-right:10px;"><input type="checkbox" checked="checked" id="cbAutoInstall">传送后自动安装APK文件或播放视频文件</label>
+	    </div>
+		<div class="play-line hide" data-tab="video">
+		   <div style="text-align:right;font-size:12px;color:blue;">
+		   <label>每次快进<input type="text" id="speedInterval" maxlength="3" value="5" style="width:30px;height:22px;" />秒</label>
+		   <label style=""><input type="checkbox" id="playUseSystem">调用系统播放器</label>
+		   <input type="button" value="停止边下边播任务" class="btn1 app-btn1" id="stopPlay" style="margin-left:10px;height:23px;margin-right:15px;">
+		   </div>
+		   <div>
+			   网络视频：<a href="javascript:$('#playUrl').val('');" style="color:#8c8c8c;font-size:12px;">[清空地址]</a><br />
+			   <input type="text" id="playUrl" placeholder="http/ftp/thunder/ed2k/rtmp/mms" value="ftp://d:d@dygodj8.com:12311/[电影天堂www.dy2018.com]超能陆战队BD国粤英中英双字.mp4" />
+			   <input type="button" value="远程播放" class="btn" id="btnPlay" />
+		   </div>
+		   <div style="margin-top:10px; position: relative;">种子视频：
+		       <input type="file" id="upfile3" value="..">
+			   <input type="button" value="上传种子" class="btn" id="btnUploadTorrent">     
+			   <input type="button" value="开始播放" class="btn" id="btnPlayTorrent">
+			   <select style="height:30px;width:115px;" id="torrentItems">
+               </select>  
+           </div>
+		   <div class="tv-list">
+		    <div class="tv-panel-title">
+			  <div style="flex:1">电视节目：</div>
+			  <div style="font-size:12px;text-align:right;">提示：需要更改下方电视直播源请<a style="color:red" id="btnShowTVEdit">点击这里</a></div>
+			</div>
+			<div class="tv-items"></div>
+		   </div>
+		   <div class="tv-edit hide">
+		      <textarea style="width:98%;height:500px" id="tvData"></textarea><br />
+              <input type="button" value="修改" class="btn" id="btnTVEdit">
+			  <input type="button" value="取消" class="btn" id="btnTVCancel">
+		  </div>
+	    </div>
+		<div class="file-panel hide" data-tab="file">
+		   <div class="file-un">
+			   <div class="file-upload">
+					<input type="file" id="upfile2" value=".." />
+					<input type="button" value="上传文件" class="btn" id="btnUpload2" />
+					<div class="upload-process" style="height:30px">
+						<div class="processbar" id="processbar2"></div>
+					</div>
+			   </div>
+			   <label style="margin-left:10px;"><input type="checkbox" id="cbFileSelect">选择</label>
+		   </div>
+		   <div class="file-oper hide">
+		       <div class="file-oper-items">
+			   </div>
+			   <div style="text-align:right">
+					<input type="button" value="复制" class="btn" id="btnCopy" onclick="postFileAction('copy');" />
+					<input type="button" value="剪切" class="btn" id="btnCut" onclick="postFileAction('cut');" />
+					<input type="button" value="删除" class="btn" id="btnDelete" onclick="postFileAction('delete');" style="color:red" />
+			   </div>
+		   </div>
+		   <div class="file-disk">
+			   <div style="text-align:right;font-size:12px;padding-right:5px;padding-bottom:5px;" id="diskSpace"></div>
+			   <div id="curPath"></div>
+			   <div class="file-list"></div>
+		   </div>
+	    </div>
+	</div>
+	<script src="/jquery_min.js"></script>
+	<script src="/ime_core.js"></script>
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?21bd14f87a177443260cab412a786bd6";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+</body>
+</html>
