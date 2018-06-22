@@ -64,3 +64,5 @@ fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
 /.DS_Store
+/IMEService/.DS_Store
+/ijkplayer/.DS_Store
