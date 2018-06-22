@@ -9,7 +9,7 @@ import com.android.tvremoteime.VideoPlayHelper;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
-import player.settings.GlobalSettings;
+
 
 /**
  * Created by kingt on 2018/1/7.
@@ -49,7 +49,7 @@ public class PlayRequestProcesser implements RequestProcesser {
             case "/changePlayFFI":
                 if(!TextUtils.isEmpty(params.get("speedInterval"))){
                     try{
-                        GlobalSettings.FastForwardInterval = Integer.valueOf(params.get("speedInterval")) * 1000;
+//                        GlobalSettings.FastForwardInterval = Integer.valueOf(params.get("speedInterval")) * 1000;
                     }catch (NumberFormatException ignored) {
                     }
                 }

@@ -97,7 +97,10 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".widget.ScreenShotActivity"></activity>
+        <activity android:name=".widget.ScreenShotActivity" />
+        <activity
+            android:name="player.TVPlayActivity"
+            android:label="@string/title_activity_tvplay"></activity>
     </application>
 
 </manifest>

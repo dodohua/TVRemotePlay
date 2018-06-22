@@ -16,12 +16,13 @@ import android.view.KeyEvent;
 
 import com.zxt.dlna.util.Action;
 
-import player.XLVideoPlayActivity;
+import player.TVPlayActivity;
+
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 /**
  * Created by kingt on 2018/4/10.
  */
-public class IJKPlayer extends XLVideoPlayActivity
+public class IJKPlayer extends TVPlayActivity
 {
     private static final int MESSAGE_UPDATE_PROGRESS = 10001;
     private Handler selfHandler = new Handler(Looper.getMainLooper()) {
@@ -29,14 +30,14 @@ public class IJKPlayer extends XLVideoPlayActivity
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MESSAGE_UPDATE_PROGRESS:
-                    if(mVideoView.isPlaying() && mMediaListener != null) {
-                        int position = mVideoView.getCurrentPosition();
-                        int duration = mVideoView.getDuration();
-                        mMediaListener.positionChanged(position);
-                        mMediaListener.durationChanged(duration);
-
-                        selfHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_PROGRESS, 500);
-                    }
+//                    if(mVideoView.isPlaying() && mMediaListener != null) {
+//                        int position = mVideoView.getCurrentPosition();
+//                        int duration = mVideoView.getDuration();
+//                        mMediaListener.positionChanged(position);
+//                        mMediaListener.durationChanged(duration);
+//
+//                        selfHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_PROGRESS, 500);
+//                    }
                     break;
             }
         }
@@ -53,12 +54,6 @@ public class IJKPlayer extends XLVideoPlayActivity
         selfHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_PROGRESS, 500);
     }
 
-    @Override
-    protected void startDownloadTask(String videoPath, int videoIndex) {
-        super.startDownloadTask(videoPath, videoIndex);
-        //非直播源
-        isLive = false;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,64 +69,26 @@ public class IJKPlayer extends XLVideoPlayActivity
         super.onDestroy();
     }
 
-    @Override
-    public void onCompletion(IMediaPlayer iMediaPlayer) {
-        if (null != mMediaListener) {
-            mMediaListener.endOfMedia();
-        }
-        super.onCompletion(iMediaPlayer);
-        selfHandler.removeMessages(MESSAGE_UPDATE_PROGRESS);
-    }
 
     @Override
-    protected void setVideoPath(String path) {
-        super.setVideoPath(path);
-        if (null != mMediaListener) {
-            mMediaListener.start();
-        }
-        this.sendUpdateMessage();
-    }
-
-    @Override
-    protected void start() {
-        super.start();
-        if (null != mMediaListener) {
-            mMediaListener.start();
-        }
-        this.sendUpdateMessage();
-    }
-    @Override
-    protected void pause() {
-        super.pause();
+    protected void onPause() {
+        super.onPause();
         if (null != mMediaListener) {
             mMediaListener.pause();
         }
         selfHandler.removeMessages(MESSAGE_UPDATE_PROGRESS);
     }
     @Override
-    protected void resume() {
-        super.resume();
+    protected void onResume() {
+        super.onResume();
         if (null != mMediaListener) {
             mMediaListener.start();
         }
         this.sendUpdateMessage();
     }
-    @Override
-    protected void stop() {
-        if (null != mMediaListener) {
-            mMediaListener.stop();
-        }
-        super.stop();
-        selfHandler.removeMessages(MESSAGE_UPDATE_PROGRESS);
-    }
 
-    @Override
-    protected void seekTo(int position) {
-        super.seekTo(position);
-        if (null != mMediaListener) {
-            mMediaListener.positionChanged(position);
-        }
-    }
+
+
 
     @Override
     public void finish() {
@@ -158,45 +115,45 @@ public class IJKPlayer extends XLVideoPlayActivity
             String str1 = intent.getStringExtra("helpAction");
 
             if (str1.equals(Action.PLAY)) {
-                doPauseResume();
+//                doPauseResume();
             } else if (str1.equals(Action.PAUSE)) {
-                doPauseResume();
+//                doPauseResume();
             } else if (str1.equals(Action.SEEK)) {
                 boolean isPaused = false;
-                if (!mVideoView.isPlaying()) {
-                    isPaused = true;
-                }
+//                if (!mVideoView.isPlaying()) {
+//                    isPaused = true;
+//                }
                 int position = intent.getIntExtra("position", 0);
-                seekTo(position);
+//                seekTo(position);
             } else if (str1.equals(Action.SET_VOLUME)) {
 
-                long eventTime = SystemClock.uptimeMillis();
-
-                double vol = intent.getDoubleExtra("volume", 0);
-                int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                int curVol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                int volume = (int) (vol * maxVolume);
-                // 变更声音
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
-
-                Log.d("IJKPlayer", "set_volume:" + vol + ", curVol:" + curVol + ", newVol:" + volume);
-                final int i = (int) (volume * 1.0 / maxVolume * 100);
-                final String s = i == 0 ? "" : i + "%";
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        $.id(com.afap.ijkplayer.R.id.app_video_volume_icon).image(i == 0 ? com.afap.ijkplayer.R.drawable.ic_volume_off_white_36dp : com.afap.ijkplayer.R.drawable
-                                .ic_volume_up_white_36dp);
-
-                        $.id(com.afap.ijkplayer.R.id.app_video_volume_box).visible();
-                        $.id(com.afap.ijkplayer.R.id.app_video_volume).text(s).visible();
-
-                        handler.removeMessages(MESSAGE_HIDE_CENTER_BOX);
-                        handler.sendEmptyMessageDelayed(MESSAGE_HIDE_CENTER_BOX, 500);
-                    }
-                });
+//                long eventTime = SystemClock.uptimeMillis();
+//
+//                double vol = intent.getDoubleExtra("volume", 0);
+//                int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+//                int curVol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+//                int volume = (int) (vol * maxVolume);
+//                // 变更声音
+//                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+//
+//                Log.d("IJKPlayer", "set_volume:" + vol + ", curVol:" + curVol + ", newVol:" + volume);
+//                final int i = (int) (volume * 1.0 / maxVolume * 100);
+//                final String s = i == 0 ? "" : i + "%";
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        $.id(com.afap.ijkplayer.R.id.app_video_volume_icon).image(i == 0 ? com.afap.ijkplayer.R.drawable.ic_volume_off_white_36dp : com.afap.ijkplayer.R.drawable
+//                                .ic_volume_up_white_36dp);
+//
+//                        $.id(com.afap.ijkplayer.R.id.app_video_volume_box).visible();
+//                        $.id(com.afap.ijkplayer.R.id.app_video_volume).text(s).visible();
+//
+//                        handler.removeMessages(MESSAGE_HIDE_CENTER_BOX);
+//                        handler.sendEmptyMessageDelayed(MESSAGE_HIDE_CENTER_BOX, 500);
+//                    }
+//                });
             } else if (str1.equals(Action.STOP)) {
-                mVideoView.stopPlayback();
+//                mVideoView.stopPlayback();
             }
         }
     }

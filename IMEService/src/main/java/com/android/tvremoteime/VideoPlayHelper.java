@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import fi.iki.elonen.NanoHTTPD;
-import player.XLVideoPlayActivity;
+//import player.XLVideoPlayActivity;
+import player.TVPlayActivity;
 import xllib.DownloadManager;
 import xllib.FileUtils;
 
@@ -36,7 +36,8 @@ public class VideoPlayHelper {
             }
         }else {
             //内部播放
-            XLVideoPlayActivity.intentTo(XLVideoPlayActivity.class, context, url, url, videoIndex);
+//            XLVideoPlayActivity.intentTo(XLVideoPlayActivity.class, context, url, url, videoIndex);
+            TVPlayActivity.intentTo(context, url, url);
         }
     }
 }

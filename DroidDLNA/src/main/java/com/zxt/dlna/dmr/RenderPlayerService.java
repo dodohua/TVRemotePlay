@@ -14,7 +14,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import player.XLVideoPlayActivity;
+
 
 public class RenderPlayerService extends Service {
 
@@ -30,7 +30,7 @@ public class RenderPlayerService extends Service {
 			Intent intent2;
 
 			if (type.equals("audio") ||  type.equals("video")) {
-				IJKPlayer.intentTo(IJKPlayer.class,this, intent.getStringExtra("playURI"),intent.getStringExtra("name"));
+				IJKPlayer.intentTo(this, intent.getStringExtra("playURI"),intent.getStringExtra("name"));
 				/**
 				intent2 = new Intent(this, IJKPlayer.class);
 				intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

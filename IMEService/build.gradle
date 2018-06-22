@@ -6,16 +6,16 @@ android {
 
     defaultConfig {
         applicationId 'com.android.tvremoteime'
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 11
         versionName "1.4.1"
     }
     buildTypes {
-        debug{
+        debug {
             minifyEnabled false
         }
-        release{
+        release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), '../proguard-project.txt'
@@ -24,8 +24,10 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(path: ':ijkplayer')
+
     compile project(path: ':AdbLib')
     compile project(path: ':DroidDLNA')
 
