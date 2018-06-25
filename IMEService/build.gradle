@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId 'com.android.tvremoteime'
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 11
         versionName "1.4.1"
         multiDexEnabled true

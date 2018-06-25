@@ -22,6 +22,8 @@ import com.zxt.dlna.dmr.ZxtMediaRenderer;
 
 import java.util.List;
 
+import player.TVPlayActivity;
+
 public class MainActivity extends Activity implements View.OnClickListener {
 
     private ImageView qrCodeImage;
@@ -48,6 +50,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Environment.toast(getApplicationContext(), "服务启动，稍后可尝试访问控制端页面");
 
         refreshQRCode();
+
+        String videoUrl = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+        TVPlayActivity.intentTo(this, videoUrl, "test");
     }
     /***
      * Android L (lollipop, API 21) introduced a new problem when trying to invoke implicit intent,

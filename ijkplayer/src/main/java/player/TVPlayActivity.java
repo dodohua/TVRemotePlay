@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -19,7 +20,7 @@ import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
 public class TVPlayActivity extends AppCompatActivity {
 
-    StandardGSYVideoPlayer videoPlayer;
+    TVPlayerView videoPlayer;
     private String mVideoPath;
     private String mVideoTitle;
     OrientationUtils orientationUtils;
@@ -59,8 +60,8 @@ public class TVPlayActivity extends AppCompatActivity {
     }
 
     private void init() {
-        videoPlayer =  (StandardGSYVideoPlayer)findViewById(R.id.video_player);
-
+        videoPlayer =  (TVPlayerView)findViewById(R.id.video_player);
+        videoPlayer.setFocusable(true);
         String source1 = mVideoPath;
 
         videoPlayer.setUp(source1, false, mVideoTitle);
@@ -125,4 +126,11 @@ public class TVPlayActivity extends AppCompatActivity {
         videoPlayer.setVideoAllCallBack(null);
         super.onBackPressed();
     }
+
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        Log.e("dodo", "activity onKeyDown: " + event.getKeyCode());
+//        return super.onKeyDown(keyCode,event);
+//    }
+
 }

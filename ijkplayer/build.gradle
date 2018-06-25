@@ -24,4 +24,5 @@ dependencies {
     //compile 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.4'
     //compile 'tv.danmaku.ijk.media:ijkplayer-arm64:0.8.4'
     compile 'com.shuyu:GSYVideoPlayer:5.0.0-beta'
+
 }
