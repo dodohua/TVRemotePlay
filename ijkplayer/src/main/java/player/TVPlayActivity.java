@@ -64,7 +64,7 @@ public class TVPlayActivity extends AppCompatActivity {
         videoPlayer.setFocusable(true);
         String source1 = mVideoPath;
 
-        videoPlayer.setUp(source1, false, mVideoTitle);
+        videoPlayer.setUp(source1, true, mVideoTitle);
 
 
         //增加title

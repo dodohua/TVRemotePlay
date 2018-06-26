@@ -23,7 +23,7 @@ public class TVPlayerView extends StandardGSYVideoPlayer{
     }
     private boolean changeProgressByKey = false;
     private int oldProgressValue = -1;
-    private int newProgressValue = -1;
+
     private int keyDownComboCount = 0;
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
@@ -31,12 +31,13 @@ public class TVPlayerView extends StandardGSYVideoPlayer{
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_LEFT:
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                Log.e("dodo", "onKeyup: ");
-                if(changeProgressByKey){
+                if (changeProgressByKey){
                     changeProgressByKey = false;
-                    oldProgressValue = -1;
+                    Log.e("dodo", "onKeyup: ");
                     endGesture();
                 }
+
+
                 break;
 
         }
@@ -51,20 +52,18 @@ public class TVPlayerView extends StandardGSYVideoPlayer{
             case KeyEvent.KEYCODE_DPAD_LEFT:
             case KeyEvent.KEYCODE_DPAD_RIGHT:
 
-                if(!changeProgressByKey)changeProgressByKey = true;
-                if(oldProgressValue == -1){
-                    oldProgressValue = 0;
-                    newProgressValue = oldProgressValue;
-                }
-                newProgressValue += keyCode == KeyEvent.KEYCODE_DPAD_LEFT ? -5 : 5;
+                changeProgressByKey = true;
+                mSeekTimePosition = (int)getGSYVideoManager().getCurrentPosition();
+                oldProgressValue = mSeekTimePosition;
+                mSeekTimePosition += (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) ? -15*1000 : 15*1000;
                 int max = this.getDuration();
-                //Log.d(TAG, "newProgressValue = " + newProgressValue);
-                if(newProgressValue < (0 - max))newProgressValue = (0 - max);
-                if(newProgressValue > max)newProgressValue = max;
-                float deltaP = oldProgressValue - newProgressValue;
-                String seekTime = CommonUtil.stringForTime(newProgressValue);
+                Log.e("dodo", "mSeekTimePosition = "+mSeekTimePosition+ "max"+max+"oldProgressValue"+oldProgressValue);
+                if(mSeekTimePosition < 0)mSeekTimePosition = 0;
+                if(mSeekTimePosition > max)mSeekTimePosition = max;
+                float deltaP = oldProgressValue - mSeekTimePosition;
+                String seekTime = CommonUtil.stringForTime(mSeekTimePosition);
                 String totalTime = CommonUtil.stringForTime(max);
-                showProgressDialog(0, seekTime, newProgressValue, totalTime, max);
+//                showProgressDialog(deltaP, seekTime, mSeekTimePosition, totalTime, max);
                 return true;
             case KeyEvent.KEYCODE_DPAD_DOWN:
             case KeyEvent.KEYCODE_DPAD_UP:
@@ -83,21 +82,16 @@ public class TVPlayerView extends StandardGSYVideoPlayer{
      * 手势结束
      */
     private void endGesture() {
-        getGSYVideoManager().seekTo(newProgressValue);
+        Log.e("dodo", "seekTo: "+mSeekTimePosition );
+        getGSYVideoManager().seekTo(mSeekTimePosition);
 
     }
     private void doPauseResume()
     {
-        if (this.getCurrentState()==CURRENT_STATE_PLAYING){
-
-            this.onVideoPause();
-            Log.e("dodo", "onVideoPause: ");
-        }else
-        {
-            this.onVideoResume();
-            Log.e("dodo", "onVideoResume: ");
-
+        if (!mHadPlay) {
+        return;
         }
+        clickStartIcon();
     }
 //    @Override
 //    public int getLayoutId() {
