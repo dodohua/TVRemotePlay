@@ -113,12 +113,13 @@ public class FileUtils {
 
     public static boolean isLiveMedia(String url){
         if(TextUtils.isEmpty(url)) return false;
-        String uri = url.toLowerCase();
-        if(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("rtmp://")  || url.startsWith("rtmps://") || url.startsWith("mms://")){
-            return true;
-        }else{
-            return false;
-        }
+//        String uri = url.toLowerCase();
+//        if(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("rtmp://")  || url.startsWith("rtmps://") || url.startsWith("mms://")){
+//            return true;
+//        }else{
+//            return false;
+//        }
+        return false;
     }
 
     public static boolean isNetworkDownloadTask(String url){
@@ -126,6 +127,10 @@ public class FileUtils {
         String uri = url.toLowerCase();
         if(uri.startsWith("thunder://") || url.startsWith("ftp://") || url.startsWith("http://")
                 || url.startsWith("https://") || url.startsWith("ed2k://") || url.startsWith("magnet:?")){
+            if (url.contains("m3u8"))
+            {
+                return false;
+            }
             return true;
         }else{
             return false;

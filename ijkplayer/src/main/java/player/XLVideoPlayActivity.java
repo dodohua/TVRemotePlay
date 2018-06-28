@@ -338,6 +338,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
 
         // init player
         IjkMediaPlayer.loadLibrariesOnce(null);
+
         IjkMediaPlayer.native_profileBegin("libijkplayer.so");
 
         mVideoView = (IjkVideoView) findViewById(R.id.video_view);
@@ -584,7 +585,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
                 mExitTime = System.currentTimeMillis();
             } else {
                 //小于2000ms则认为是用户确实希望退出程序-调用System.exit()方法进行退出
-                System.exit(0);
+                finish();
             }
             return true;
         }
