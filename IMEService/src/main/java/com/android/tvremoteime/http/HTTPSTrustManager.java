@@ -9,6 +9,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 /**
@@ -57,13 +58,14 @@ public class HTTPSTrustManager implements X509TrustManager {
         }
 
         try {
-            context = SSLContext.getInstance("TLS");
+            context = SSLContext.getInstance("TLSv1");
             context.init(null, trustManagers, new SecureRandom());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (KeyManagementException e) {
             e.printStackTrace();
         }
-        HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+        SSLSocketFactory NoSSLv3Factory = new NoSSLv3SocketFactory(context.getSocketFactory());
+        HttpsURLConnection.setDefaultSSLSocketFactory(NoSSLv3Factory);
     }
 }

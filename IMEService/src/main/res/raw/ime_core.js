@@ -355,12 +355,13 @@ $("#btnPlay").on("click", function() {
 		|| url.indexOf('ftp://') == 0 
 		|| url.indexOf('rtmp://') == 0 
 		|| url.indexOf('rtmps://') == 0
+		|| url.indexOf('magnet:') == 0
 		|| url.indexOf('mms://') == 0)){
 			$.post("/play", {playUrl: url, "useSystem":$('#playUseSystem')[0].checked}, function(data) {
 				console.log(data)
 			})
 	}else{
-		alert('请输入正确的网络视频地址，只支持http/ftp/thunder/ed2k/rtmp/mms。');
+		alert('请输入正确的网络视频地址，只支持http/ftp/thunder/ed2k/rtmp/mms/magnet');
 	}
 })
 function playMedia(obj){

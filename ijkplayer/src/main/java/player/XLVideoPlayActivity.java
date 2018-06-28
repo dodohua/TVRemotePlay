@@ -255,14 +255,28 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_xl_play_video);
 
-        xlDownloadManager.init(getApplicationContext());
-
 //        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 //        mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, TAG);
 
+        initPlay();
+
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        runningInstance = null;
+        isRunning = false;
+
+        if(mVideoView != null) stop();
+        xlDownloadManager.taskInstance().stopTask();
+        initPlay();
+
+    }
+    private void initPlay(){
+        xlDownloadManager.init(getApplicationContext());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mMaxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-
         mVideoPath = getIntent().getStringExtra("videoPath");
         mVideoTitle = getIntent().getStringExtra("videoTitle");
         mVideoIndex = getIntent().getIntExtra("videoIndex", 0);
@@ -357,6 +371,8 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
         isRunning = true;
         runningInstance = this;
     }
+
+
 
     @Override
     public void onCompletion(IMediaPlayer iMediaPlayer) {
@@ -551,16 +567,28 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
         return super.onKeyUp(keyCode, event);
     }
 
+    private long mExitTime;
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode==KeyEvent.KEYCODE_ESCAPE||keyCode==KeyEvent.KEYCODE_BACK)
+        {
+            if(playListView.isShown()) {
+                show(defaultTimeout);
+                return true;
+            }
+            //与上次点击返回键时刻作差
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                //大于2000ms则认为是误操作，使用Toast进行提示
+                Toast.makeText(this, "再按一次退出播放界面", Toast.LENGTH_SHORT).show();
+                //并记录下本次点击“返回键”的时刻，以便下次进行判断
+                mExitTime = System.currentTimeMillis();
+            } else {
+                //小于2000ms则认为是用户确实希望退出程序-调用System.exit()方法进行退出
+                System.exit(0);
+            }
+            return true;
+        }
         switch (keyCode){
-            case KeyEvent.KEYCODE_ESCAPE:
-            case KeyEvent.KEYCODE_BACK:
-                if(playListView.isShown()) {
-                    show(defaultTimeout);
-                    return true;
-                }
-                break;
             case KeyEvent.KEYCODE_DPAD_LEFT:
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 if(!changeProgressByKey)changeProgressByKey = true;
