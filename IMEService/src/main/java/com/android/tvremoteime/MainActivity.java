@@ -22,6 +22,8 @@ import com.zxt.dlna.dmr.ZxtMediaRenderer;
 
 import java.util.List;
 
+import player.XLVideoPlayActivity;
+
 public class MainActivity extends Activity implements View.OnClickListener {
 
     private ImageView qrCodeImage;
@@ -48,6 +50,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Environment.toast(getApplicationContext(), "服务启动，稍后可尝试访问控制端页面");
 
         refreshQRCode();
+
+        XLVideoPlayActivity.intentTo(XLVideoPlayActivity.class, this, "https://135zyv4.xw0371.com/2018/06/26/mSQ3D0E2gPZxQAb2/playlist.m3u8", "test", 0);
     }
     /***
      * Android L (lollipop, API 21) introduced a new problem when trying to invoke implicit intent,

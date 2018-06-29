@@ -64,3 +64,10 @@ fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
 /.DS_Store
+/thunder/src/main/.DS_Store
+/thunder/src/.DS_Store
+/thunder/.DS_Store
+/IMEService/.DS_Store
+/ijkplayer/src/main/.DS_Store
+/ijkplayer/src/.DS_Store
+/ijkplayer/.DS_Store
