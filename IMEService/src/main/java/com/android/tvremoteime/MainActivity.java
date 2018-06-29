@@ -51,7 +51,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         refreshQRCode();
 
-        XLVideoPlayActivity.intentTo(XLVideoPlayActivity.class, this, "https://135zyv4.xw0371.com/2018/06/26/mSQ3D0E2gPZxQAb2/playlist.m3u8", "test", 0);
+//        XLVideoPlayActivity.intentTo(XLVideoPlayActivity.class, this, "https://135zyv4.xw0371.com/2018/06/26/mSQ3D0E2gPZxQAb2/playlist.m3u8", "test", 0);
     }
     /***
      * Android L (lollipop, API 21) introduced a new problem when trying to invoke implicit intent,

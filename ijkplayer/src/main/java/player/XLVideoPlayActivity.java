@@ -62,7 +62,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
     private static final int MESSAGE_FADE_OUT = 2;
     private static final int MESSAGE_SEEK_NEW_POSITION = 3;
     protected static final int MESSAGE_HIDE_CENTER_BOX = 4;
-    private static final int MESSAGE_RESTART_PLAY = 5;
+    public static final int MESSAGE_RESTART_PLAY = 5;
     private static final int MESSAGE_LIVE_RESTART = 6;
 
     private static boolean isRunning = false;
@@ -235,7 +235,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
     protected void startDownloadTask(String videoPath,  int videoIndex){
         if(TextUtils.isEmpty(videoPath)) {
             Toast.makeText(this, "没有视频播放资源，退出播放任务.", Toast.LENGTH_LONG).show();
-            finish();
+//            finish();
             return;
         }
         xlDownloadManager.taskInstance().setUrl(videoPath);
@@ -244,7 +244,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
                 TextUtils.isEmpty(xlDownloadManager.taskInstance().getPlayUrl())){
             Toast.makeText(this, "无法运行资源下载任务，退出播放任务.", Toast.LENGTH_LONG).show();
             Log.e(TAG, "无法运行资源下载任务，退出播放任务.");
-            finish();
+//            finish();
             return;
         }
         isLive = xlDownloadManager.taskInstance().isLiveMedia();
@@ -275,6 +275,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
     }
     private void initPlay(){
         xlDownloadManager.init(getApplicationContext());
+        xlDownloadManager.taskInstance().mHandler = handler;
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mMaxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         mVideoPath = getIntent().getStringExtra("videoPath");
@@ -377,7 +378,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
 
     @Override
     public void onCompletion(IMediaPlayer iMediaPlayer) {
-        finish();
+//        finish();
     }
 
     @Override
@@ -863,7 +864,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
         return orientation;
     }
 
-    protected Handler handler = new Handler(Looper.getMainLooper()) {
+    public Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {

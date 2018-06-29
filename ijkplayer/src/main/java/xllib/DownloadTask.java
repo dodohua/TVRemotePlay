@@ -1,6 +1,8 @@
 package xllib;
 
+import android.content.Intent;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -12,6 +14,8 @@ import com.xunlei.downloadlib.parameter.XLTaskInfo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import player.XLVideoPlayActivity;
 
 /**
  * Created by kingt on 2018/2/2.
@@ -64,7 +68,7 @@ public class DownloadTask {
 
     public void setUrl(String url) {
         //删除旧任务及文件
-        this.stopTask();
+//        this.stopTask();
 
         this.url = url;
         this.playList.clear();
@@ -136,7 +140,18 @@ public class DownloadTask {
             return this.getUrl();
         }else if(this.taskId != 0L){
             if(this.isNetworkDownloadTask){
-                return XLTaskHelper.instance().getLoclUrl(this.localSavePath + this.name);
+                if(this.url.toLowerCase().startsWith("magnet:?")){
+                    Log.e(TAG, "sendReplay: 磁力链接");
+                    XLTaskInfo taskInfo = XLTaskHelper.instance().getTaskInfo(taskId);
+                    String torrentPath = localSavePath+XLTaskHelper.instance().getFileName(this.url);
+                    Log.e(TAG, "sendReplay:种子路径"+torrentPath);
+                    this.setUrl(torrentPath);
+                    this.startTask();
+                    this.sendReplay();
+                }else {
+                    return XLTaskHelper.instance().getLoclUrl(this.localSavePath + this.name);
+                }
+
             }else if(this.torrentInfo != null && this.currentPlayMediaIndex != -1){
                 for(PlayListItem item : getPlayList()){
                     if(item.getIndex() == this.currentPlayMediaIndex){
@@ -146,6 +161,12 @@ public class DownloadTask {
             }
         }
         return null;
+    }
+    //发通知
+    public Handler mHandler;
+    private void sendReplay(){
+        Log.e(TAG, "sendReplay: 重新播放");
+        mHandler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 3000);
     }
     public boolean changePlayItem(int index){
         if(this.torrentInfo != null && index != this.currentPlayMediaIndex){
@@ -173,8 +194,11 @@ public class DownloadTask {
 
         if(this.isNetworkDownloadTask){
             if(this.url.toLowerCase().startsWith("magnet:?")){
-                Log.e(TAG, "暂时不支持magnet链的下载播放");
-                return false;
+                try {
+                    taskId = XLTaskHelper.instance().addMagentTask(this.url, localSavePath, null);
+                } catch (Exception e) {
+                    Log.e(TAG, "startTask: 失败");
+                }
             }else {
                 taskId = XLTaskHelper.instance().addThunderTask(this.url, localSavePath, null);
             }
@@ -183,6 +207,7 @@ public class DownloadTask {
                 try {
                     taskId = XLTaskHelper.instance().addTorrentTask(this.url, localSavePath, this.getTorrentDeselectedIndexs());
                 } catch (Exception e) {
+                    Log.e(TAG, "startTask: 失败");
                 }
             }
         }else {
