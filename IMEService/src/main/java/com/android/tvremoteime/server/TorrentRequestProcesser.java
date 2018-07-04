@@ -23,9 +23,10 @@ import xllib.PlayListItem;
 
 public class TorrentRequestProcesser implements RequestProcesser  {
     private Context context;
-    private DownloadTask downloadTask = new DownloadTask();
+    private DownloadTask downloadTask ;
     public TorrentRequestProcesser(Context context){
         this.context = context;
+        downloadTask = new DownloadTask(this.context);
     }
 
     @Override

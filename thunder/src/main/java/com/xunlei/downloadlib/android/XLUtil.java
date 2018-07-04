@@ -512,16 +512,14 @@ public class XLUtil {
             if (telephonyManager != null) {
                 try {
                     String subscriberId = telephonyManager.getSubscriberId();
-                    if(subscriberId != null) {
-                        if (subscriberId.startsWith("46000") || subscriberId.startsWith("46002")) {
-                            return NetWorkCarrier.CMCC;
-                        }
-                        if (subscriberId.startsWith("46001")) {
-                            return NetWorkCarrier.CU;
-                        }
-                        if (subscriberId.startsWith("46003")) {
-                            return NetWorkCarrier.CT;
-                        }
+                    if (subscriberId.startsWith("46000") || subscriberId.startsWith("46002")) {
+                        return NetWorkCarrier.CMCC;
+                    }
+                    if (subscriberId.startsWith("46001")) {
+                        return NetWorkCarrier.CU;
+                    }
+                    if (subscriberId.startsWith("46003")) {
+                        return NetWorkCarrier.CT;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

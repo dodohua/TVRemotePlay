@@ -214,7 +214,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
                         $.id(R.id.app_video_loading).visible();
                         startDownloadTask(videoPath, videoIndex);
                         playListItemAdapter.notifyDataSetChanged();
-                        handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 3000);
+                        handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 5000);
                     }
                 }
             });
@@ -316,10 +316,11 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
 
         if(TextUtils.isEmpty(mVideoPath)){
             Toast.makeText(this, "没有播放资源地址，退出播放任务。", Toast.LENGTH_LONG).show();
-            finish();
+//            finish();
             return;
         }
 
+        Log.e(TAG, "magnet: 磁力链接开始下载");
         startDownloadTask(mVideoPath, mVideoIndex);
 
         playListView = (RecyclerView)findViewById(R.id.play_list_view);
@@ -368,7 +369,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
 
         screenWidthPixels = getResources().getDisplayMetrics().widthPixels;
 
-        handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 2000);
+        handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 5000);
 
         isRunning = true;
         runningInstance = this;

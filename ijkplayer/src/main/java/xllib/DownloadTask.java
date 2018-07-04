@@ -1,5 +1,6 @@
 package xllib;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
@@ -22,6 +23,7 @@ import player.XLVideoPlayActivity;
  */
 
 public class DownloadTask {
+    private Context context;
     public interface DownloadTaskBaseDirGetter{
         public abstract File getBaseDir();
     }
@@ -41,8 +43,8 @@ public class DownloadTask {
         }
     }
 
-    public DownloadTask(){
-
+    public DownloadTask(Context context){
+        this.context = context;
     }
 
     private String url;
@@ -75,8 +77,8 @@ public class DownloadTask {
         this.mIsLiveMedia = FileUtils.isLiveMedia(this.url);
         this.isNetworkDownloadTask = !this.mIsLiveMedia && FileUtils.isNetworkDownloadTask(this.url);
         this.name = this.mIsLiveMedia ? FileUtils.getWebMediaFileName(this.url) :
-                     this.isNetworkDownloadTask ? XLTaskHelper.instance().getFileName(this.url) : FileUtils.getFileName(this.url);
-        this.localSavePath = (new File(getBaseDir(), FileUtils.getFileNameWithoutExt(this.name)).toString()) + "/";
+                     this.isNetworkDownloadTask ? XLTaskHelper.instance(this.context).getFileName(this.url) : FileUtils.getFileName(this.url);
+        this.localSavePath = getBaseDir().toString() + "/";
         this.isLocalMedia = !this.mIsLiveMedia && !this.isNetworkDownloadTask && FileUtils.isMediaFile(this.name);
         this.torrentInfo = null;
         this.torrentMediaIndexs = null;
@@ -87,7 +89,7 @@ public class DownloadTask {
         }else if(this.mIsLiveMedia || this.isNetworkDownloadTask){
             playList.add(new PlayListItem(this.name, 0, 0L));
         } else if (".torrent".equals(FileUtils.getFileExt(this.name))) {
-            this.torrentInfo = XLTaskHelper.instance().getTorrentInfo(this.url);
+            this.torrentInfo = XLTaskHelper.instance(this.context).getTorrentInfo(this.url);
             this.initTorrentIndexs();
         }
     }
@@ -142,20 +144,20 @@ public class DownloadTask {
             if(this.isNetworkDownloadTask){
                 if(this.url.toLowerCase().startsWith("magnet:?")){
                     Log.e(TAG, "sendReplay: 磁力链接");
-                    XLTaskInfo taskInfo = XLTaskHelper.instance().getTaskInfo(taskId);
-                    String torrentPath = localSavePath+XLTaskHelper.instance().getFileName(this.url);
+                    XLTaskInfo taskInfo = XLTaskHelper.instance(this.context).getTaskInfo(taskId);
+                    String torrentPath = localSavePath+XLTaskHelper.instance(this.context).getFileName(this.url);
                     Log.e(TAG, "sendReplay:种子路径"+torrentPath);
                     this.setUrl(torrentPath);
                     this.startTask();
                     this.sendReplay();
                 }else {
-                    return XLTaskHelper.instance().getLoclUrl(this.localSavePath + this.name);
+                    return XLTaskHelper.instance(this.context).getLoclUrl(this.localSavePath + this.name);
                 }
 
             }else if(this.torrentInfo != null && this.currentPlayMediaIndex != -1){
                 for(PlayListItem item : getPlayList()){
                     if(item.getIndex() == this.currentPlayMediaIndex){
-                        return XLTaskHelper.instance().getLoclUrl(this.localSavePath + item.getName());
+                        return XLTaskHelper.instance(this.context).getLoclUrl(this.localSavePath + item.getName());
                     }
                 }
             }
@@ -195,17 +197,23 @@ public class DownloadTask {
         if(this.isNetworkDownloadTask){
             if(this.url.toLowerCase().startsWith("magnet:?")){
                 try {
-                    taskId = XLTaskHelper.instance().addMagentTask(this.url, localSavePath, null);
+                    Log.e(TAG, "magnet: 磁力链接");
+                    taskId = XLTaskHelper.instance(this.context).addMagentTask(this.url, localSavePath, null);
+                    Log.e(TAG, "startTask: taskId"+taskId);
                 } catch (Exception e) {
                     Log.e(TAG, "startTask: 失败");
                 }
             }else {
-                taskId = XLTaskHelper.instance().addThunderTask(this.url, localSavePath, null);
+                try {
+                    taskId = XLTaskHelper.instance(this.context).addThunderTask(this.url, localSavePath, null);
+                } catch (Exception e) {
+                    Log.e(TAG, "startTask: 失败");
+                }
             }
         }else if(this.torrentInfo != null) {
             if(this.currentPlayMediaIndex != -1) {
                 try {
-                    taskId = XLTaskHelper.instance().addTorrentTask(this.url, localSavePath, this.getTorrentDeselectedIndexs());
+                    taskId = XLTaskHelper.instance(this.context).addTorrentTask(this.url, localSavePath, this.getTorrentDeselectedIndexs());
                 } catch (Exception e) {
                     Log.e(TAG, "startTask: 失败");
                 }
@@ -220,14 +228,14 @@ public class DownloadTask {
     public void stopTask(){
         if(this.taskId != 0L){
             if(!this.isLocalMedia && !this.mIsLiveMedia) {
-                XLTaskHelper.instance().deleteTask(this.taskId, this.localSavePath);
+//                XLTaskHelper.instance().deleteTask(this.taskId, this.localSavePath);
             }
             Log.d(TAG, "stopTask(" + this.url + "), taskId = " + taskId);
             this.taskId = 0L;
         }
     }
     public XLTaskInfo getTaskInfo(){
-        return this.taskId == 0L || this.isLocalMedia || this.mIsLiveMedia ? null : XLTaskHelper.instance().getTaskInfo(this.taskId);
+        return this.taskId == 0L || this.isLocalMedia || this.mIsLiveMedia ? null : XLTaskHelper.instance(this.context).getTaskInfo(this.taskId);
     }
 
     public String getName() {

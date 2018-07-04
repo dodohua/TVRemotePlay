@@ -13,7 +13,7 @@ public class DownloadManager {
     private Context context;
 
     private DownloadManager(){
-        this.downloadTask = new DownloadTask();
+
     }
 
     private static volatile DownloadManager instance = null;
@@ -30,10 +30,9 @@ public class DownloadManager {
     }
 
     public void init(Context context){
-        if(this.context == null) {
-            XLTaskHelper.init(context);
-        }
         this.context = context;
+        this.downloadTask = new DownloadTask(this.context);
+        XLTaskHelper.init(this.context);
     }
 
     private DownloadTask downloadTask;

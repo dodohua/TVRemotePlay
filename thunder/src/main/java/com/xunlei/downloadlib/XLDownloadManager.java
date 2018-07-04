@@ -31,6 +31,7 @@ import com.xunlei.downloadlib.parameter.ServerResourceParam;
 import com.xunlei.downloadlib.parameter.ThunderUrlInfo;
 import com.xunlei.downloadlib.parameter.TorrentInfo;
 import com.xunlei.downloadlib.parameter.UrlQuickInfo;
+import com.xunlei.downloadlib.parameter.XLConstant;
 import com.xunlei.downloadlib.parameter.XLConstant.XLManagerStatus;
 import com.xunlei.downloadlib.parameter.XLProductInfo;
 import com.xunlei.downloadlib.parameter.XLSessionInfo;
@@ -123,7 +124,7 @@ public class XLDownloadManager {
     }
 
     public synchronized int init(Context context, InitParam initParam, boolean z) {
-        int i = 9900;
+        int i = XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
         int i2 = 0;
         synchronized (this) {
             if (!mIsLoadErrcodeMsg) {
@@ -143,9 +144,10 @@ public class XLDownloadManager {
                     if (mAllowExecution) {
                         i2 = XLUtil.getNetworkTypeComplete(context);
                     }
-                      i = this.mLoader.init(initParam.mAppKey, "com.xunlei.downloadprovider", initParam.mAppVersion, "", peerid, guid, initParam.mStatSavePath, initParam.mStatCfgSavePath, i2, initParam.mPermissionLevel);
+                    i = this.mLoader.init(context, initParam.mAppVersion, "", peerid, guid, initParam.mStatSavePath, initParam.mStatCfgSavePath, i2, initParam.mPermissionLevel);
                     if (i != 9000) {
                         mDownloadManagerState = XLManagerStatus.MANAGER_INIT_FAIL;
+                        XLLog.e(TAG, "XLDownloadManager init failed ret=" + i);
                     } else {
                         mDownloadManagerState = XLManagerStatus.MANAGER_RUNNING;
                         doMonitorNetworkChange();

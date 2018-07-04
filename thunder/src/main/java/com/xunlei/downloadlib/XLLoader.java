@@ -1,7 +1,7 @@
 package com.xunlei.downloadlib;
 
 import android.content.Context;
-import com.xunlei.downloadlib.android.XLLog;
+
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
 import com.xunlei.downloadlib.parameter.BtTaskStatus;
@@ -67,6 +67,7 @@ class XLLoader {
 
     public native int getSessionInfoByUrl(String str, XLSessionInfo xLSessionInfo);
 
+
     public native int getTaskInfo(long j, int i, XLTaskInfo xLTaskInfo);
 
     public native int getTaskInfoEx(long j, XLTaskInfoEx xLTaskInfoEx);
@@ -75,7 +76,7 @@ class XLLoader {
 
     public native int getUrlQuickInfo(long j, UrlQuickInfo urlQuickInfo);
 
-    public native int init(String str, String str2, String str3, String str4, String str5, String str6, String str7, String str8, int i, int i2);
+    public native int init(Context context, String str, String str2, String str3, String str4, String str5, String str6, int i, int i2);
 
     public native boolean isLogTurnOn();
 
@@ -153,6 +154,5 @@ class XLLoader {
         System.loadLibrary("xl_stat");
         System.loadLibrary("xluagc");
         System.loadLibrary("xl_thunder_sdk");
-        System.loadLibrary("xl_thunder_iface");
     }
 }
