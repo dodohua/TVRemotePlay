@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -70,7 +72,7 @@ public class DownloadTask {
 
     public void setUrl(String url) {
         //删除旧任务及文件
-//        this.stopTask();
+        this.stopTask();
 
         this.url = url;
         this.playList.clear();
@@ -138,26 +140,18 @@ public class DownloadTask {
     }
 
     public String getPlayUrl(){
+        String urlMd5 = FileUtils.getMD5Str(this.url);
+        String videoSavePath = localSavePath+urlMd5+"/";
         if(this.isLocalMedia || this.mIsLiveMedia){
             return this.getUrl();
         }else if(this.taskId != 0L){
             if(this.isNetworkDownloadTask){
-                if(this.url.toLowerCase().startsWith("magnet:?")){
-                    Log.e(TAG, "sendReplay: 磁力链接");
-                    XLTaskInfo taskInfo = XLTaskHelper.instance(this.context).getTaskInfo(taskId);
-                    String torrentPath = localSavePath+XLTaskHelper.instance(this.context).getFileName(this.url);
-                    Log.e(TAG, "sendReplay:种子路径"+torrentPath);
-                    this.setUrl(torrentPath);
-                    this.startTask();
-                    this.sendReplay();
-                }else {
-                    return XLTaskHelper.instance(this.context).getLoclUrl(this.localSavePath + this.name);
-                }
 
+                return XLTaskHelper.instance(this.context).getLoclUrl(videoSavePath + this.name);
             }else if(this.torrentInfo != null && this.currentPlayMediaIndex != -1){
                 for(PlayListItem item : getPlayList()){
                     if(item.getIndex() == this.currentPlayMediaIndex){
-                        return XLTaskHelper.instance(this.context).getLoclUrl(this.localSavePath + item.getName());
+                        return XLTaskHelper.instance(this.context).getLoclUrl(videoSavePath+ item.getName());
                     }
                 }
             }
@@ -167,8 +161,15 @@ public class DownloadTask {
     //发通知
     public Handler mHandler;
     private void sendReplay(){
-        Log.e(TAG, "sendReplay: 重新播放");
-        mHandler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 3000);
+        Log.e(TAG, "sendReplay: 磁力链接");
+        XLTaskInfo taskInfo = XLTaskHelper.instance(this.context).getTaskInfo(taskId);
+        String urlMd5 = FileUtils.getMD5Str(this.url);
+        String videoSavePath = localSavePath+urlMd5+"/";
+        String torrentPath = videoSavePath+XLTaskHelper.instance(this.context).getFileName(this.url);
+        Log.e(TAG, "sendReplay:种子路径"+torrentPath);
+        this.setUrl(torrentPath);
+        this.startTask();
+        mHandler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 2000);
     }
     public boolean changePlayItem(int index){
         if(this.torrentInfo != null && index != this.currentPlayMediaIndex){
@@ -188,24 +189,76 @@ public class DownloadTask {
         return null;
     }
 
+    Handler downloHandler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 0) {
+                if (loopCount>10){
+                    sendReplay();
+                    return;
+                }
+                long taskId = (long) msg.obj;
+                XLTaskInfo taskInfo = XLTaskHelper.instance(DownloadTask.this.context).getTaskInfo(taskId);
+                if (taskInfo.mFileSize>0)
+                {
+                    if (taskInfo.mFileSize == taskInfo.mDownloadSize)
+                    {
+                        sendReplay();
+                        return;
+                    }
+                }
+                Log.e(TAG, "handleMessage: taskInfo.mFileSize"+taskInfo.mFileSize +"taskInfo.mDownloadSize"+taskInfo.mDownloadSize);
 
+                loopCount++;
+                downloHandler.sendMessageDelayed(downloHandler.obtainMessage(0,taskId),1000);
+            }
+        }
+    };
+
+    private boolean isMagnet = false;
+    private int loopCount = 0;
     public boolean startTask(){
         if(TextUtils.isEmpty(this.url) || this.taskId != 0L){
             return false;
         }
-
+        File theDir = new File(localSavePath);
+        if (!theDir.exists()) {
+            try{
+                theDir.mkdir();
+            }
+            catch(SecurityException se){
+                se.printStackTrace();
+            }
+        }
+        String urlMd5 = FileUtils.getMD5Str(this.url);
+        String videoSavePath = localSavePath+urlMd5+"/";
+        theDir = new File(videoSavePath);
+        if (!theDir.exists()) {
+            try{
+                theDir.mkdir();
+            }
+            catch(SecurityException se){
+                se.printStackTrace();
+            }
+        }
         if(this.isNetworkDownloadTask){
             if(this.url.toLowerCase().startsWith("magnet:?")){
+                isMagnet = true;
                 try {
                     Log.e(TAG, "magnet: 磁力链接");
-                    taskId = XLTaskHelper.instance(this.context).addMagentTask(this.url, localSavePath, null);
+                    taskId = XLTaskHelper.instance(this.context).addMagentTask(this.url, videoSavePath, null);
                     Log.e(TAG, "startTask: taskId"+taskId);
+                    if (taskId!=-1){
+                        loopCount = 0;
+                        downloHandler.sendMessageDelayed(downloHandler.obtainMessage(0,taskId),1000);
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "startTask: 失败");
                 }
             }else {
                 try {
-                    taskId = XLTaskHelper.instance(this.context).addThunderTask(this.url, localSavePath, null);
+                    taskId = XLTaskHelper.instance(this.context).addThunderTask(this.url, videoSavePath, null);
                 } catch (Exception e) {
                     Log.e(TAG, "startTask: 失败");
                 }
@@ -213,7 +266,7 @@ public class DownloadTask {
         }else if(this.torrentInfo != null) {
             if(this.currentPlayMediaIndex != -1) {
                 try {
-                    taskId = XLTaskHelper.instance(this.context).addTorrentTask(this.url, localSavePath, this.getTorrentDeselectedIndexs());
+                    taskId = XLTaskHelper.instance(this.context).addTorrentTask(this.url, videoSavePath, this.getTorrentDeselectedIndexs());
                 } catch (Exception e) {
                     Log.e(TAG, "startTask: 失败");
                 }
@@ -222,13 +275,22 @@ public class DownloadTask {
             taskId = this.isLocalMedia || this.mIsLiveMedia ? -9999L : 0L;
         }
         Log.d(TAG, "startTask(" + this.url + "), taskId = " + taskId + ", index = " + currentPlayMediaIndex);
+        boolean result = (taskId != 0L&&taskId != -1);
+        if (!isMagnet&&result)
+        {
+            //通知播放
+            sendReplay();
+        }
         return  taskId != 0L;
     }
 
     public void stopTask(){
+        loopCount = 0;
         if(this.taskId != 0L){
             if(!this.isLocalMedia && !this.mIsLiveMedia) {
-//                XLTaskHelper.instance().deleteTask(this.taskId, this.localSavePath);
+                String urlMd5 = FileUtils.getMD5Str(this.url);
+                String videoSavePath = localSavePath+urlMd5+"/";
+                XLTaskHelper.instance(this.context).deleteTask(this.taskId, videoSavePath);
             }
             Log.d(TAG, "stopTask(" + this.url + "), taskId = " + taskId);
             this.taskId = 0L;

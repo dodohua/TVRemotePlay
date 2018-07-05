@@ -42,6 +42,8 @@ import com.afap.ijkplayer.R;
 import com.xunlei.downloadlib.parameter.XLConstant;
 import com.xunlei.downloadlib.parameter.XLTaskInfo;
 
+import java.net.URLDecoder;
+
 import player.settings.GlobalSettings;
 import player.widget.media.IjkVideoView;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -214,7 +216,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
                         $.id(R.id.app_video_loading).visible();
                         startDownloadTask(videoPath, videoIndex);
                         playListItemAdapter.notifyDataSetChanged();
-                        handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 5000);
+                        handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 3000);
                     }
                 }
             });
@@ -227,7 +229,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
             $.id(R.id.app_video_loading).visible();
             if(xlDownloadManager.taskInstance().changePlayItem(videoIndex)) {
                 playListItemAdapter.notifyDataSetChanged();
-                handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 6000);
+                handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 3000);
             }
         }
     }
@@ -240,11 +242,10 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
         }
         xlDownloadManager.taskInstance().setUrl(videoPath);
         if(videoIndex > 0)xlDownloadManager.taskInstance().changePlayItem(videoIndex);
-        if(!xlDownloadManager.taskInstance().startTask() ||
-                TextUtils.isEmpty(xlDownloadManager.taskInstance().getPlayUrl())){
+        if(!xlDownloadManager.taskInstance().startTask()){
             Toast.makeText(this, "无法运行资源下载任务，退出播放任务.", Toast.LENGTH_LONG).show();
             Log.e(TAG, "无法运行资源下载任务，退出播放任务.");
-//            finish();
+            finish();
             return;
         }
         isLive = xlDownloadManager.taskInstance().isLiveMedia();
@@ -369,7 +370,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
 
         screenWidthPixels = getResources().getDisplayMetrics().widthPixels;
 
-        handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 5000);
+//        handler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 5000);
 
         isRunning = true;
         runningInstance = this;
@@ -900,6 +901,12 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
                     }
                     $.id(R.id.app_video_loading).visible();
                     String uri = xlDownloadManager.taskInstance().getPlayUrl();
+                    try {
+                        uri = URLDecoder.decode(uri, "utf-8");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
                     if(TextUtils.isEmpty(uri)) {
                         Toast.makeText(XLVideoPlayActivity.this, "没有播放资源地址，退出播放任务。", Toast.LENGTH_LONG).show();
                         finish();
