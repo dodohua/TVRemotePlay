@@ -15,6 +15,7 @@ import com.xunlei.downloadlib.parameter.TorrentInfo;
 import com.xunlei.downloadlib.parameter.XLTaskInfo;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,12 +147,24 @@ public class DownloadTask {
             return this.getUrl();
         }else if(this.taskId != 0L){
             if(this.isNetworkDownloadTask){
-
-                return XLTaskHelper.instance(this.context).getLoclUrl(videoSavePath + this.name);
+                String uri = XLTaskHelper.instance(this.context).getLoclUrl(videoSavePath + this.name);
+                try {
+                    uri = URLDecoder.decode(uri, "utf-8");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                return uri;
             }else if(this.torrentInfo != null && this.currentPlayMediaIndex != -1){
                 for(PlayListItem item : getPlayList()){
                     if(item.getIndex() == this.currentPlayMediaIndex){
-                        return XLTaskHelper.instance(this.context).getLoclUrl(videoSavePath+ item.getName());
+                        String uri = XLTaskHelper.instance(this.context).getLoclUrl(videoSavePath+ item.getName());
+                        try {
+                            uri = URLDecoder.decode(uri, "utf-8");
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
+                        return uri;
                     }
                 }
             }
@@ -161,15 +174,16 @@ public class DownloadTask {
     //发通知
     public Handler mHandler;
     private void sendReplay(){
-        Log.e(TAG, "sendReplay: 磁力链接");
-        XLTaskInfo taskInfo = XLTaskHelper.instance(this.context).getTaskInfo(taskId);
-        String urlMd5 = FileUtils.getMD5Str(this.url);
-        String videoSavePath = localSavePath+urlMd5+"/";
-        String torrentPath = videoSavePath+XLTaskHelper.instance(this.context).getFileName(this.url);
-        Log.e(TAG, "sendReplay:种子路径"+torrentPath);
-        this.setUrl(torrentPath);
-        this.startTask();
-        mHandler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 2000);
+       if (isMagnet){
+           XLTaskInfo taskInfo = XLTaskHelper.instance(this.context).getTaskInfo(taskId);
+           String urlMd5 = FileUtils.getMD5Str(this.url);
+           String videoSavePath = localSavePath+urlMd5+"/";
+           String torrentPath = videoSavePath+XLTaskHelper.instance(this.context).getFileName(this.url);
+           Log.e(TAG, "sendReplay:种子路径"+torrentPath);
+           this.setUrl(torrentPath);
+           this.startTask();
+       }
+       mHandler.sendEmptyMessageDelayed(XLVideoPlayActivity.MESSAGE_RESTART_PLAY, 1500);
     }
     public boolean changePlayItem(int index){
         if(this.torrentInfo != null && index != this.currentPlayMediaIndex){
@@ -243,6 +257,7 @@ public class DownloadTask {
             }
         }
         if(this.isNetworkDownloadTask){
+            isMagnet = false;
             if(this.url.toLowerCase().startsWith("magnet:?")){
                 isMagnet = true;
                 try {

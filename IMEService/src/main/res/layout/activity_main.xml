@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.android.tvremoteime.MainActivity"
+    tools:context="com.android.tvremoteplay.MainActivity"
     android:background="#444"
     android:padding="15dp"
     >

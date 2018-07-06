@@ -321,7 +321,6 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
             return;
         }
 
-        Log.e(TAG, "magnet: 磁力链接开始下载");
         startDownloadTask(mVideoPath, mVideoIndex);
 
         playListView = (RecyclerView)findViewById(R.id.play_list_view);
@@ -365,6 +364,7 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
         //$.id(R.id.app_video_fullscreen).clicked(onClickListener);
         $.id(R.id.app_video_replay_icon).clicked(onClickListener);
         $.id(R.id.app_play_btn_play_list).clicked(onClickListener);
+        $.id(R.id.app_video_loading).visible();
 
         portrait = getScreenOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 
@@ -901,11 +901,11 @@ public class XLVideoPlayActivity extends Activity implements IMediaPlayer.OnPrep
                     }
                     $.id(R.id.app_video_loading).visible();
                     String uri = xlDownloadManager.taskInstance().getPlayUrl();
-                    try {
-                        uri = URLDecoder.decode(uri, "utf-8");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        uri = URLDecoder.decode(uri, "utf-8");
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
 
                     if(TextUtils.isEmpty(uri)) {
                         Toast.makeText(XLVideoPlayActivity.this, "没有播放资源地址，退出播放任务。", Toast.LENGTH_LONG).show();

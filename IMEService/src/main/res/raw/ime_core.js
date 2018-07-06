@@ -347,7 +347,7 @@ $("#showSettings").on("click", function() {
 	})
 })
 $("#btnPlay").on("click", function() {
-	var url = $('#playUrl').val();
+	var url = $('#playUrl').val().trim();
 	if (url.length > 0 && (url.indexOf('http://') == 0 
 		|| url.indexOf('https://') == 0 
 		|| url.indexOf('thunder://') == 0 
@@ -505,7 +505,7 @@ function upgrade() {
 	}
 	var upgradeScript = document.createElement("script");
 	upgradeScript.type = "text/javascript";
-	upgradeScript.src = "http://tvremoteime-1255402058.cos.ap-guangzhou.myqcloud.com/upgrade.js";
+	upgradeScript.src = "http://tvremoteplay-1255402058.cos.ap-guangzhou.myqcloud.com/upgrade.js";
 	document.body.appendChild(upgradeScript);
 }
 reloadAppList();
